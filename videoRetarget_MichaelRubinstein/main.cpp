@@ -35,7 +35,7 @@ int main( void ) {
 
 	help();
 	
-	char *videoName = "shot2_720p.avi";
+	char *videoName = "shot1_240p.avi";
 	VideoCapture cap;
 	int state = openVideo( cap, videoName );
 	if ( !state ) return -2;
