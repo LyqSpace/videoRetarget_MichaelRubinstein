@@ -74,27 +74,51 @@ void seamCarving( VideoCapture &cap ) {
 
 	int framePos = 0;
 	int frameCount = (int)cap.get( CV_CAP_PROP_FRAME_COUNT );
-	const int frameAmount = 30;
-	Mat frames[frameAmount];
+	const int frameAmount = 150;
+	Mat frames[frameAmount], grad[frameAmount], spatialEnergy;
+	Size frameSize( (int)cap.get( CV_CAP_PROP_FRAME_WIDTH ), (int)cap.get( CV_CAP_PROP_FRAME_HEIGHT ) );
+
+	cout << frameSize.height << " " << frameSize.width << endl;
 
 	while ( framePos < frameCount ) {
 		
 		if ( framePos == 0 ) {
-
-			cap.read( frames[0] );
+			
+			Mat inputFrame;
+			cap.read( inputFrame );
+			cvtColor( inputFrame, frames[0], CV_RGB2GRAY );
+			medianBlur( frames[0], frames[0], 3 );
 			framePos++;
-			while ( framePos != frameAmount ) {
-				cap.read( frames[framePos] );
+			while ( framePos != frameAmount && framePos < frameCount ) {
+				cap.read( inputFrame );
+				cvtColor( inputFrame, frames[framePos], CV_RGB2GRAY );
+				medianBlur( frames[framePos], frames[framePos], 3 );
 				framePos++;
 			}
+			
+			framePos = 0;
+
 		} else {
-			 
+			
 			for ( int i = 1; i < frameAmount; i++ ) frames[i - 1] = frames[i];
-			cap.read( frames[frameAmount - 1] );
+			Mat inputFrame;
+			cap.read( inputFrame );
+			cvtColor( inputFrame, frames[0], CV_RGB2GRAY );
 			framePos++;
 		}
 		
-		imshow( "test", frames[frameAmount - 1] );
-		waitKey( 40 );
+		cv::imshow( "test", frames[frameAmount - 1] );
+		cv::waitKey( 40 );
+
+		Mat sobelResult, xOrder, yOrder;
+		for ( int i = 0; i < frameAmount; i++ ) {
+
+			Sobel( frames[i], sobelResult, CV_16S, 1, 0 );
+			convertScaleAbs( sobelResult, xOrder, 0.5 );
+		}
+
+
 	}
+
+
 }
