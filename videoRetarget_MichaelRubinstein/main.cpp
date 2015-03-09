@@ -58,7 +58,7 @@ int main( void ) {
 
 	help();
 	
-	int funcType = 0;
+	int funcType = 1;
 
 	if ( funcType == 0 ) {
 
@@ -78,7 +78,7 @@ int main( void ) {
 			maxFlow();
 			surfaceCarving( frames, surfaceDeleted );
 			int endTime = clock();
-			cout << "<<< Time used : " << endTime - startTime << endl;
+			cout << "<<< Time used : " << endTime - startTime << " ms" << endl;
 		}
 	} else {
 
@@ -115,6 +115,11 @@ bool readVideo( VideoCapture &cap, const char *videoName, vector<Mat> &frames, d
 
 	Mat inputFrame, resizeFrame, grayFrame, blurFrame;
 	int count = 0;
+	char bmpName[100];
+	
+	//int ex = static_cast<int>(cap.get(CV_CAP_PROP_FOURCC));
+	//cout << ex;
+
 	while ( cap.read( inputFrame ) ) {
 
 		resize( inputFrame, resizeFrame, Size(), sizeScalar, sizeScalar );
@@ -124,6 +129,9 @@ bool readVideo( VideoCapture &cap, const char *videoName, vector<Mat> &frames, d
 
 		//imshow( "originVideo", blurFrame );
 		//waitKey( 50 );
+
+		sprintf( bmpName, "inResource//%d.bmp", count );
+		imwrite( bmpName, blurFrame );
 
 		count++;
 		if ( count == 100 ) break;
@@ -175,6 +183,8 @@ void buildGraph( vector<Mat> &frames ) {
 				p2 = txy2num( t, x - 1, y, frameCount, frameSize );
 				if ( p1 != -1 && p2 != -1) {
 					w = abs( rowData[x + 1] - rowData[x - 1] );
+					//w = abs( (abs( rowData[ x + 1 ] - rowData[ x ] ) + abs( rowData[ x ] - rowData[ x - 1 ] )) / 2
+					//	- abs( rowData[ x + 1 ] - rowData[ x - 1 ] ) );
 				} else {
 					if ( p1 != -1 ) {
 						w = abs( rowData[x + 1] - rowData[x] );
@@ -182,10 +192,9 @@ void buildGraph( vector<Mat> &frames ) {
 						w = abs( rowData[x] - rowData[x - 1] );
 					}
 				}
-				//if ( w != 0 ) {
-					buildEdge( edgeHead, edge, p0, p1, w, true );
-					buildEdge( edgeHead, edge, p1, p0, 0 );
-				//}
+			
+				buildEdge( edgeHead, edge, p0, p1, w, true );
+				buildEdge( edgeHead, edge, p1, p0, INF );
 			}
 		}
 
@@ -201,10 +210,10 @@ void buildGraph( vector<Mat> &frames ) {
 				p2 = txy2num( t, x - 1, y, frameCount, frameSize );
 				if ( p1 != -1 && p2 != -1 ) {
 					w = abs( rowData0[x] - rowData1[x - 1] );
-					//if ( w != 0 ) {
-						buildEdge( edgeHead, edge, p0, p1, w );
-						buildEdge( edgeHead, edge, p1, p0, 0 );
-					//}
+					//w = abs( (abs( rowData0[ x ] - rowData1[ x ] ) + abs( rowData0[ x - 1 ] - rowData1[ x - 1 ] )) / 2
+					//	- abs( rowData0[ x ] - rowData1[ x - 1 ] ) );
+					buildEdge( edgeHead, edge, p0, p1, w );
+					buildEdge( edgeHead, edge, p1, p0, 0 );
 					buildEdge( edgeHead, edge, p1, p2, INF );
 					buildEdge( edgeHead, edge, p2, p1, 0 );
 				}
@@ -215,10 +224,10 @@ void buildGraph( vector<Mat> &frames ) {
 				p2 = txy2num( t, x, y, frameCount, frameSize );
 				if ( p1 != -1 && p2 != -1 ) {
 					w = abs( rowData0[x - 1] - rowData1[x] );
-					//if ( w != 0 ) {
-						buildEdge( edgeHead, edge, p0, p2, w );
-						buildEdge( edgeHead, edge, p2, p0, 0 );
-					//}
+					//w = abs( (abs( rowData0[ x ] - rowData1[ x ] ) + abs( rowData0[ x - 1 ] - rowData1[ x - 1 ] )) / 2
+					//	- abs( rowData0[ x - 1 ] - rowData1[ x ] ) );		
+					buildEdge( edgeHead, edge, p0, p2, w );
+					buildEdge( edgeHead, edge, p2, p0, 0 );			
 					buildEdge( edgeHead, edge, p2, p1, INF );
 					buildEdge( edgeHead, edge, p1, p2, 0 );
 				}
@@ -243,10 +252,10 @@ void buildGraph( vector<Mat> &frames ) {
 				p2 = txy2num( t - 1, x, y, frameCount, frameSize );
 				if ( p1 != -1 && p2 != -1 ) {
 					w = abs( rowData0[x] - rowData1[x - 1] );
-					//if ( w != 0 ) {
-						buildEdge( edgeHead, edge, p0, p2, w );
-						buildEdge( edgeHead, edge, p2, p0, 0 );
-					//}
+					//w = abs( (abs( rowData0[ x ] - rowData1[ x ] ) + abs( rowData0[ x - 1 ] - rowData1[ x - 1 ] )) / 2
+					//	- abs( rowData0[ x ] - rowData1[ x - 1 ] ) );
+					buildEdge( edgeHead, edge, p0, p2, w );
+					buildEdge( edgeHead, edge, p2, p0, 0 );
 					buildEdge( edgeHead, edge, p2, p1, INF );
 					buildEdge( edgeHead, edge, p1, p2, 0 );
 				}
@@ -257,10 +266,10 @@ void buildGraph( vector<Mat> &frames ) {
 				p2 = txy2num( t - 1, x - 1, y, frameCount, frameSize );
 				if ( p1 != -1 && p2 != -1 ) {
 					w = abs( rowData0[x - 1] - rowData1[x] );
-					//if ( w != 0 ) {
-						buildEdge( edgeHead, edge, p0, p1, w );
-						buildEdge( edgeHead, edge, p1, p0, 0 );
-					//}
+					//w = abs( (abs( rowData0[ x ] - rowData1[ x ] ) + abs( rowData0[ x - 1 ] - rowData1[ x - 1 ] )) / 2
+					//	- abs( rowData0[ x - 1 ] - rowData1[ x ] ) );
+					buildEdge( edgeHead, edge, p0, p1, w );
+					buildEdge( edgeHead, edge, p1, p0, 0 );
 					buildEdge( edgeHead, edge, p1, p2, INF );
 					buildEdge( edgeHead, edge, p2, p1, 0 );
 				}
@@ -440,7 +449,7 @@ void surfaceCarving( vector<Mat> &frames, int surfaceNum ) {
 bool writeVideo( const char *videoName ) {
 
 	VideoWriter outputVideo;
-	outputVideo.open( videoName, CV_FOURCC( 'I', 'Y', 'U', 'V' ), 25, Size( 15, 15 ) );
+	outputVideo.open(videoName, CV_FOURCC('I', 'Y', 'U', 'V'), 25, Size(505, 250));
 
 	if ( !outputVideo.isOpened() ) {
 
@@ -448,17 +457,51 @@ bool writeVideo( const char *videoName ) {
 		return false;
 	}
 
-	char frameName[100];
-	Mat oneFrame;
+	char inFrameName[100], outFrameName[100], combineFrameName[100];
+	Mat inFrame, outFrame, outFrame1, combineFrame;
+	uchar *rowData0, *rowData1;
+	namedWindow( "combineVideo" );
+
 	for ( int i = 0; i < 20; i++ ) {
 		
-		sprintf( frameName, "outResult//10_%d.bmp", i );
-		oneFrame = imread( frameName );
-		outputVideo << oneFrame;
+		sprintf( inFrameName, "inResource//%d.bmp", i);
+		inFrame = imread( inFrameName );
+		cvtColor( inFrame, inFrame, CV_RGB2GRAY );
+		resize( inFrame, inFrame, Size(), 10, 10 );
+		sprintf( outFrameName, "outResult//10_%d.bmp", i );
+		outFrame = imread( outFrameName );
+		cvtColor( outFrame, outFrame, CV_RGB2GRAY );
+		resize( outFrame, outFrame, Size(), 10, 10 );
+
+		sprintf( outFrameName, "outResult1//10_%d.bmp", i );
+		outFrame1 = imread( outFrameName );
+		cvtColor( outFrame1, outFrame1, CV_RGB2GRAY );
+		resize( outFrame1, outFrame1, Size(), 10, 10 );
+
+		combineFrame = Mat::zeros( inFrame.rows, inFrame.cols * 3 + 10, inFrame.type() );
 		
-		imshow( "output", oneFrame );
+		for ( int y = 0; y < inFrame.rows; y++ ) {
+			 
+			rowData0 = combineFrame.ptr<uchar>( y );
+			rowData1 = inFrame.ptr<uchar>( y );
+			for ( int x = 0; x < inFrame.cols; x++ ) rowData0[x] = rowData1[x];
+			
+			rowData1 = outFrame.ptr<uchar>( y );
+			for ( int x = 0; x < outFrame.cols; x++) rowData0[x + inFrame.cols + 5] = rowData1[x];
+
+			rowData1 = outFrame1.ptr<uchar>( y );
+			for ( int x = 0; x < outFrame.cols; x++ ) rowData0[x + inFrame.cols*2 + 10] = rowData1[x];
+		
+		}
+
+		sprintf(combineFrameName, "combineFrame//%d.bmp", i);
+		imwrite(combineFrameName, combineFrame);
+		outputVideo << combineFrame;
+		imshow( "combineVideo", combineFrame );
 		waitKey( 100 );
 	}
+
+	waitKey( 0 );
 
 	return true;
 }
