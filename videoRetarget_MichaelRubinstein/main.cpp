@@ -183,8 +183,6 @@ void buildGraph( vector<Mat> &frames ) {
 				p2 = txy2num( t, x - 1, y, frameCount, frameSize );
 				if ( p1 != -1 && p2 != -1) {
 					w = abs( rowData[x + 1] - rowData[x - 1] );
-					//w = abs( (abs( rowData[ x + 1 ] - rowData[ x ] ) + abs( rowData[ x ] - rowData[ x - 1 ] )) / 2
-					//	- abs( rowData[ x + 1 ] - rowData[ x - 1 ] ) );
 				} else {
 					if ( p1 != -1 ) {
 						w = abs( rowData[x + 1] - rowData[x] );
@@ -209,9 +207,8 @@ void buildGraph( vector<Mat> &frames ) {
 				p1 = txy2num( t, x, y - 1, frameCount, frameSize );
 				p2 = txy2num( t, x - 1, y, frameCount, frameSize );
 				if ( p1 != -1 && p2 != -1 ) {
-					w = abs( rowData0[x] - rowData1[x - 1] );
-					//w = abs( (abs( rowData0[ x ] - rowData1[ x ] ) + abs( rowData0[ x - 1 ] - rowData1[ x - 1 ] )) / 2
-					//	- abs( rowData0[ x ] - rowData1[ x - 1 ] ) );
+					//w = abs( rowData0[x] - rowData1[x - 1] );
+					w = abs( rowData0[ x - 1 ] - rowData1[ x ] - rowData0[ x ] + rowData1[ x - 1 ] );
 					buildEdge( edgeHead, edge, p0, p1, w );
 					buildEdge( edgeHead, edge, p1, p0, 0 );
 					buildEdge( edgeHead, edge, p1, p2, INF );
@@ -223,9 +220,8 @@ void buildGraph( vector<Mat> &frames ) {
 				p1 = txy2num( t, x - 1, y - 1, frameCount, frameSize );
 				p2 = txy2num( t, x, y, frameCount, frameSize );
 				if ( p1 != -1 && p2 != -1 ) {
-					w = abs( rowData0[x - 1] - rowData1[x] );
-					//w = abs( (abs( rowData0[ x ] - rowData1[ x ] ) + abs( rowData0[ x - 1 ] - rowData1[ x - 1 ] )) / 2
-					//	- abs( rowData0[ x - 1 ] - rowData1[ x ] ) );		
+					//w = abs( rowData0[x - 1] - rowData1[x] );
+					w = abs( rowData0[ x ] - rowData1[ x - 1 ] - rowData0[ x - 1 ] + rowData1[ x ] );
 					buildEdge( edgeHead, edge, p0, p2, w );
 					buildEdge( edgeHead, edge, p2, p0, 0 );			
 					buildEdge( edgeHead, edge, p2, p1, INF );
@@ -251,9 +247,8 @@ void buildGraph( vector<Mat> &frames ) {
 				p1 = txy2num( t, x - 1, y, frameCount, frameSize );
 				p2 = txy2num( t - 1, x, y, frameCount, frameSize );
 				if ( p1 != -1 && p2 != -1 ) {
-					w = abs( rowData0[x] - rowData1[x - 1] );
-					//w = abs( (abs( rowData0[ x ] - rowData1[ x ] ) + abs( rowData0[ x - 1 ] - rowData1[ x - 1 ] )) / 2
-					//	- abs( rowData0[ x ] - rowData1[ x - 1 ] ) );
+					//w = abs( rowData0[x] - rowData1[x - 1] );
+					w = abs( rowData0[ x - 1 ] - rowData1[ x ] - rowData0[ x ] + rowData1[ x - 1 ] );
 					buildEdge( edgeHead, edge, p0, p2, w );
 					buildEdge( edgeHead, edge, p2, p0, 0 );
 					buildEdge( edgeHead, edge, p2, p1, INF );
@@ -265,9 +260,8 @@ void buildGraph( vector<Mat> &frames ) {
 				p1 = txy2num( t, x, y, frameCount, frameSize );
 				p2 = txy2num( t - 1, x - 1, y, frameCount, frameSize );
 				if ( p1 != -1 && p2 != -1 ) {
-					w = abs( rowData0[x - 1] - rowData1[x] );
-					//w = abs( (abs( rowData0[ x ] - rowData1[ x ] ) + abs( rowData0[ x - 1 ] - rowData1[ x - 1 ] )) / 2
-					//	- abs( rowData0[ x - 1 ] - rowData1[ x ] ) );
+					//w = abs( rowData0[x - 1] - rowData1[x] );
+					w = abs( rowData0[ x ] - rowData1[ x - 1 ] - rowData0[ x - 1 ] + rowData1[ x ] );
 					buildEdge( edgeHead, edge, p0, p1, w );
 					buildEdge( edgeHead, edge, p1, p0, 0 );
 					buildEdge( edgeHead, edge, p1, p2, INF );
